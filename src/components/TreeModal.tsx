@@ -30,8 +30,9 @@ export const TreeModal = () => {
   return (
     <div className="relative flex flex-col items-center w-2/3 min-h-1/4 shadow-md rounded-2xl bg-gray-800 p-6 text-white">
       <h1 className="text-xl m-3 uppercase">tree</h1>
-      {state.items.map((item) => (
+      {state.items.map((item, i) => (
         <CatalogItem
+          index={i}
           handleRightClick={handleRightClick}
           treeItem={item}
           level={0}
