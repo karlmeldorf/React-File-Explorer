@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Folder,
+  moveItem,
   renameItem,
   setEditingItemId,
   TreeItem,
@@ -48,6 +49,24 @@ export const CatalogItem: React.FC<TreeFileProps> = ({
     }
   };
 
+  const handleDragStart = (e: any) => {
+    e.dataTransfer.setData("text/plain", treeItem.id);
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragOver = (e: any) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleOnDrop = (e: any) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const id = e.dataTransfer.getData("text/plain");
+    dispatch(moveItem({ id, newParentId: treeItem.id }));
+    console.log("drop", id);
+  };
+
   return (
     <div
       className="transition-all duration-500 ease-in-out"
@@ -66,6 +85,11 @@ export const CatalogItem: React.FC<TreeFileProps> = ({
               opacity: "0",
             }
       }
+      id={`${treeItem.id}-treeItem`}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDrop={handleOnDrop}
+      draggable
     >
       {isShown && (
         <div

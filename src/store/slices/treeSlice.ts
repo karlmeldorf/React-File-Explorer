@@ -32,6 +32,11 @@ export interface RenamePayload {
   newName: string;
 }
 
+export interface MovePayload {
+  id: string;
+  newParentId: string;
+}
+
 const initialTreeState: TreeState = {
   items: [],
   editingItemId: undefined,
@@ -83,6 +88,24 @@ const renameTreeItem = (
   });
 
   return newItems;
+};
+
+const moveTreeItem = (
+  items: TreeItem[],
+  id: string,
+  newParentId: string
+): TreeItem[] => {
+  const treeItem = findItemById(items, id);
+  const parent = findItemById(items, newParentId);
+  const newState = deleteTreeItem(items, id);
+
+  if (!parent || !treeItem) {
+    return items;
+  }
+
+  (parent as Folder).children = [...(parent as Folder).children, treeItem];
+
+  return newState;
 };
 
 const findItemById = (items: TreeItem[], id: string) => {
@@ -160,6 +183,14 @@ export const treeSlice = createSlice({
       const newState = deleteTreeItem(state.items, action.payload);
       state.items = [...newState];
     },
+    moveItem: (state: TreeState, action: PayloadAction<MovePayload>) => {
+      const newState = moveTreeItem(
+        state.items,
+        action.payload.id,
+        action.payload.newParentId
+      );
+      state.items = [...newState];
+    },
     setEditingItemId: (
       state: TreeState,
       action: PayloadAction<string | undefined>
@@ -170,7 +201,7 @@ export const treeSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addItem, renameItem, deleteItem, setEditingItemId } =
+export const { addItem, renameItem, deleteItem, moveItem, setEditingItemId } =
   treeSlice.actions;
 
 export default treeSlice.reducer;
